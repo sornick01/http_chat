@@ -19,7 +19,7 @@ type App struct {
 
 func NewApp() (*App, error) {
 
-	expiresAt, err := time.ParseDuration("5m")
+	expiresAt, err := time.ParseDuration("15m")
 	if err != nil {
 		return nil, err
 	}

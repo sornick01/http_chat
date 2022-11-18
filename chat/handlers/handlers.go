@@ -80,11 +80,14 @@ func (h *Handlers) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-
 	resp := &signInResponse{Token: token}
 	respJson, err := json.Marshal(resp)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
+	w.WriteHeader(http.StatusOK)
 	w.Write(respJson)
 }
 
@@ -119,6 +122,42 @@ func (h *Handlers) SendMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handlers) ReadPrivateMessage(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value(chat.CtxUserKey).(*models.User)
+
+	messages, err := h.useCase.GetPrivateMessages(r.Context(), user)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := json.Marshal(messages)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
+}
+
+func (h *Handlers) ReadGlobalMessages(w http.ResponseWriter, r *http.Request) {
+	messages, err := h.useCase.GetGlobalMessages(r.Context())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := json.Marshal(messages)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 }
 
 func jsonToSignInput(body []byte) (*signInput, error) {

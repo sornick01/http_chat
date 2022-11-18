@@ -16,5 +16,7 @@ func RegisterHTTPEndpoints(rout *chi.Mux, useCase chat.UseCase) {
 
 	r.Use(middleware.Auth)
 	r.Post("/send", h.SendMessage)
+	r.Get("/read/private", h.ReadPrivateMessage)
+	r.Get("/read/global", h.ReadGlobalMessages)
 	rout.Mount("/api", r)
 }
