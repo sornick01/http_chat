@@ -2,7 +2,6 @@ package localcache
 
 import (
 	"context"
-	"errors"
 	"sample/chat"
 	"sample/models"
 )
@@ -55,14 +54,19 @@ func (l *LocalStorage) AddGlobalMessage(ctx context.Context, message *models.Mes
 func (l *LocalStorage) AddPrivateMessage(ctx context.Context, recipient string, message *models.Message) error {
 	l.privateMessageStorage.mutex.Lock()
 	defer l.privateMessageStorage.mutex.Unlock()
-	for k, _ := range l.privateMessageStorage.messages {
-		if k == recipient {
-			l.privateMessageStorage.messages[recipient] = append(l.privateMessageStorage.messages[recipient], message)
-			return nil
-		}
+	if _, inMap := l.privateMessageStorage.messages[recipient]; inMap {
+		l.privateMessageStorage.messages[recipient] = append(l.privateMessageStorage.messages[recipient], message)
+	} else {
+		l.privateMessageStorage.messages[recipient] = []*models.Message{message}
 	}
+	//for k, _ := range l.privateMessageStorage.messages {
+	//	if k == recipient {
+	//		l.privateMessageStorage.messages[recipient] = append(l.privateMessageStorage.messages[recipient], message)
+	//		return nil
+	//	}
+	//}
 
-	return errors.New("no such user")
+	return nil
 }
 
 func (l *LocalStorage) GetGlobalMessages(ctx context.Context) ([]*models.Message, error) {

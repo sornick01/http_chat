@@ -86,9 +86,11 @@ func (c *Chat) ParseToken(ctx context.Context, accessString string) (*models.Use
 		}
 		return c.signingKey, nil
 	})
+
 	if err != nil {
-		return nil, err
+		return nil, chat.ErrInvalidAccessToken
 	}
+
 	if claims, ok := token.Claims.(*AuthClaims); ok && token.Valid {
 		return claims.User, nil
 	}

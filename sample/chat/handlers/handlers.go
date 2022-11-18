@@ -23,8 +23,8 @@ type signInResponse struct {
 }
 
 type messageInput struct {
-	recipient string `json:"recipient"`
-	text      string `json:"text"`
+	Recipient string `json:"recipient"`
+	Text      string `json:"text"`
 }
 
 func NewHandler(useCase chat.UseCase) *Handlers {
@@ -104,13 +104,17 @@ func (h *Handlers) SendMessage(w http.ResponseWriter, r *http.Request) {
 
 	user := r.Context().Value(chat.CtxUserKey).(*models.User)
 
-	if mes.recipient == "" {
-		err = h.useCase.AddGlobalMessage(r.Context(), user, mes.text)
+	if mes.Recipient == "" {
+		err = h.useCase.AddGlobalMessage(r.Context(), user, mes.Text)
 	} else {
-		err = h.useCase.AddPrivateMessage(r.Context(), user, mes.recipient, mes.text)
+		err = h.useCase.AddPrivateMessage(r.Context(), user, mes.Recipient, mes.Text)
 	}
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+		if err == chat.ErrUserNotFound {
+			status = http.StatusBadRequest
+		}
+		w.WriteHeader(status)
 		return
 	}
 
@@ -138,7 +142,7 @@ func jsonToMessageInput(body []byte) (*messageInput, error) {
 		return nil, err
 	}
 
-	if mes.text == "" {
+	if mes.Text == "" {
 		return nil, errors.New("empty message")
 	}
 
