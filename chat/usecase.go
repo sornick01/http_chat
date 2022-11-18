@@ -2,7 +2,7 @@ package chat
 
 import (
 	"context"
-	"sample/models"
+	"github.com/sornick01/http_chat/models"
 )
 
 const CtxUserKey = "user"

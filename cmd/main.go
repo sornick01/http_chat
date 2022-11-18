@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/sornick01/http_chat/server"
 	"log"
-	"sample/server"
 )
 
 func main() {

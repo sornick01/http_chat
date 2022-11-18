@@ -2,12 +2,12 @@ package server
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/sornick01/http_chat/chat"
+	"github.com/sornick01/http_chat/chat/handlers"
+	"github.com/sornick01/http_chat/chat/repository/localcache"
+	"github.com/sornick01/http_chat/chat/usecase"
 	"log"
 	"net/http"
-	"sample/chat"
-	"sample/chat/handlers"
-	"sample/chat/repository/localcache"
-	"sample/chat/usecase"
 	"time"
 )
 

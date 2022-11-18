@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"sample/chat"
-	"sample/models"
+	"github.com/sornick01/http_chat/chat"
+	"github.com/sornick01/http_chat/models"
 	"time"
 )
 

@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
+	"github.com/sornick01/http_chat/chat"
 	"net/http"
-	"sample/chat"
 	"strings"
 )
 

@@ -3,10 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"github.com/sornick01/http_chat/chat"
+	"github.com/sornick01/http_chat/models"
 	"io"
 	"net/http"
-	"sample/chat"
-	"sample/models"
 )
 
 type Handlers struct {

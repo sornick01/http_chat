@@ -2,8 +2,8 @@ package localcache
 
 import (
 	"context"
-	"sample/chat"
-	"sample/models"
+	"github.com/sornick01/http_chat/chat"
+	"github.com/sornick01/http_chat/models"
 )
 
 type LocalStorage struct {

@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/go-chi/chi/v5"
-	"sample/chat"
+	"github.com/sornick01/http_chat/chat"
 )
 
 func RegisterHTTPEndpoints(rout *chi.Mux, useCase chat.UseCase) {
