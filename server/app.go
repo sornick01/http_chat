@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"github.com/go-chi/chi/v5"
 	"github.com/sornick01/http_chat/chat"
 	"github.com/sornick01/http_chat/chat/handlers"
@@ -8,6 +9,9 @@ import (
 	"github.com/sornick01/http_chat/chat/usecase"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -41,5 +45,30 @@ func (a *App) Run(port string) {
 		Addr:    ":" + port,
 		Handler: mainRoute,
 	}
-	log.Fatal(a.httpServer.ListenAndServe())
+
+	go func() {
+		if err := a.httpServer.ListenAndServe(); err != nil {
+			if err == http.ErrServerClosed {
+				log.Println("Server closed")
+				return
+			}
+			log.Fatalf("Failed to listen and serve: %+v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	stopAppCh := make(chan struct{})
+	go func() {
+		log.Println("Captured signal: ", <-quit)
+		log.Println("Gracefully shutting down server...")
+
+		if err := a.httpServer.Shutdown(context.Background()); err != nil {
+			log.Fatal("Can't shutdown main server: ", err.Error())
+		}
+		stopAppCh <- struct{}{}
+	}()
+
+	<-stopAppCh
 }

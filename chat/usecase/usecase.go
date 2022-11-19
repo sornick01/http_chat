@@ -64,7 +64,7 @@ func (c *Chat) SignIn(ctx context.Context, username, password string) (string, e
 	}
 
 	if user.Password != password {
-		return "", errors.New("wrong password")
+		return "", chat.ErrUserNotFound
 	}
 
 	claims := AuthClaims{
