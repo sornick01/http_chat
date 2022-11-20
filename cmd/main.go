@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/sornick01/http_chat/server"
+	"github.com/sornick01/http_chat/internal/server"
 	"log"
 )
 

@@ -1,7 +1,7 @@
 package localcache
 
 import (
-	"github.com/sornick01/http_chat/models"
+	"github.com/sornick01/http_chat/internal/models"
 	"sync"
 )
 

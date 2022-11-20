@@ -3,14 +3,14 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/sornick01/http_chat/chat"
-	"github.com/sornick01/http_chat/models"
+	chat2 "github.com/sornick01/http_chat/internal/chat"
+	"github.com/sornick01/http_chat/internal/models"
 	"io"
 	"net/http"
 )
 
 type Handlers struct {
-	useCase chat.UseCase
+	useCase chat2.UseCase
 }
 
 type signInput struct {
@@ -27,7 +27,7 @@ type messageInput struct {
 	Text      string `json:"text"`
 }
 
-func NewHandler(useCase chat.UseCase) *Handlers {
+func NewHandler(useCase chat2.UseCase) *Handlers {
 	return &Handlers{
 		useCase: useCase,
 	}
@@ -71,7 +71,7 @@ func (h *Handlers) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	token, err := h.useCase.SignIn(r.Context(), inp.Username, inp.Password)
 	if err != nil {
-		if err == chat.ErrUserNotFound {
+		if err == chat2.ErrUserNotFound {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -105,7 +105,7 @@ func (h *Handlers) SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := r.Context().Value(chat.CtxUserKey).(*models.User)
+	user := r.Context().Value(chat2.CtxUserKey).(*models.User)
 
 	if mes.Recipient == "" {
 		err = h.useCase.AddGlobalMessage(r.Context(), user, mes.Text)
@@ -114,7 +114,7 @@ func (h *Handlers) SendMessage(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		status := http.StatusInternalServerError
-		if err == chat.ErrUserNotFound {
+		if err == chat2.ErrUserNotFound {
 			status = http.StatusBadRequest
 		}
 		w.WriteHeader(status)
@@ -125,7 +125,7 @@ func (h *Handlers) SendMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) ReadPrivateMessage(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value(chat.CtxUserKey).(*models.User)
+	user := r.Context().Value(chat2.CtxUserKey).(*models.User)
 
 	messages, err := h.useCase.GetPrivateMessages(r.Context(), user)
 	if err != nil {

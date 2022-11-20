@@ -2,16 +2,16 @@ package handlers
 
 import (
 	"context"
-	"github.com/sornick01/http_chat/chat"
+	chat2 "github.com/sornick01/http_chat/internal/chat"
 	"net/http"
 	"strings"
 )
 
 type AuthMiddleware struct {
-	useCase chat.UseCase
+	useCase chat2.UseCase
 }
 
-func NewAuthMiddleware(useCase chat.UseCase) *AuthMiddleware {
+func NewAuthMiddleware(useCase chat2.UseCase) *AuthMiddleware {
 	return &AuthMiddleware{
 		useCase: useCase,
 	}
@@ -36,7 +36,7 @@ func (am *AuthMiddleware) Auth(handler http.Handler) http.Handler {
 
 		user, err := am.useCase.ParseToken(r.Context(), headerParts[1])
 		if err != nil {
-			if err == chat.ErrInvalidAccessToken {
+			if err == chat2.ErrInvalidAccessToken {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
@@ -45,7 +45,7 @@ func (am *AuthMiddleware) Auth(handler http.Handler) http.Handler {
 			return
 		}
 
-		userCtx := context.WithValue(r.Context(), chat.CtxUserKey, user)
+		userCtx := context.WithValue(r.Context(), chat2.CtxUserKey, user)
 		handler.ServeHTTP(w, r.WithContext(userCtx))
 	}
 

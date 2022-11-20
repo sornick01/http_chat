@@ -3,7 +3,7 @@ package handlers
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/sornick01/http_chat/chat"
+	"github.com/sornick01/http_chat/internal/chat"
 )
 
 func RegisterHTTPEndpoints(rout *chi.Mux, useCase chat.UseCase) {
@@ -11,8 +11,8 @@ func RegisterHTTPEndpoints(rout *chi.Mux, useCase chat.UseCase) {
 
 	rout.Use(middleware.RequestID)
 	rout.Use(middleware.Logger)
-	rout.Post("/signUp", h.SignUp)
-	rout.Post("/signIn", h.SignIn)
+	rout.Post("/sign-up", h.SignUp)
+	rout.Post("/sign-in", h.SignIn)
 
 	r := chi.NewRouter()
 	authMiddleware := NewAuthMiddleware(useCase)

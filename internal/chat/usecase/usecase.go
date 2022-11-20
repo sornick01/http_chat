@@ -6,25 +6,25 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/sornick01/http_chat/chat"
-	"github.com/sornick01/http_chat/models"
+	chat2 "github.com/sornick01/http_chat/internal/chat"
+	models2 "github.com/sornick01/http_chat/internal/models"
 	"time"
 )
 
 type AuthClaims struct {
 	jwt.RegisteredClaims
-	User *models.User
+	User *models2.User
 }
 
 type Chat struct {
-	repo           chat.Repo
+	repo           chat2.Repo
 	hashSalt       string
 	signingKey     []byte
 	expireDuration time.Duration
 }
 
 func NewChat(
-	repo chat.Repo,
+	repo chat2.Repo,
 	hashSalt string,
 	signingKey []byte,
 	expireDuration time.Duration) *Chat {
@@ -44,7 +44,7 @@ func (c *Chat) SignUp(ctx context.Context, username, password string) error {
 	pwd.Write([]byte(password))
 	pwd.Write([]byte(c.hashSalt))
 
-	user := &models.User{
+	user := &models2.User{
 		Username: username,
 		Password: fmt.Sprintf("%x", pwd.Sum(nil)),
 	}
@@ -64,7 +64,7 @@ func (c *Chat) SignIn(ctx context.Context, username, password string) (string, e
 	}
 
 	if user.Password != password {
-		return "", chat.ErrUserNotFound
+		return "", chat2.ErrUserNotFound
 	}
 
 	claims := AuthClaims{
@@ -79,7 +79,7 @@ func (c *Chat) SignIn(ctx context.Context, username, password string) (string, e
 	return token.SignedString(c.signingKey)
 }
 
-func (c *Chat) ParseToken(ctx context.Context, accessString string) (*models.User, error) {
+func (c *Chat) ParseToken(ctx context.Context, accessString string) (*models2.User, error) {
 	token, err := jwt.ParseWithClaims(accessString, &AuthClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -88,26 +88,26 @@ func (c *Chat) ParseToken(ctx context.Context, accessString string) (*models.Use
 	})
 
 	if err != nil {
-		return nil, chat.ErrInvalidAccessToken
+		return nil, chat2.ErrInvalidAccessToken
 	}
 
 	if claims, ok := token.Claims.(*AuthClaims); ok && token.Valid {
 		return claims.User, nil
 	}
 
-	return nil, chat.ErrInvalidAccessToken
+	return nil, chat2.ErrInvalidAccessToken
 }
 
-func (c *Chat) GetPrivateMessages(ctx context.Context, user *models.User) ([]*models.Message, error) {
+func (c *Chat) GetPrivateMessages(ctx context.Context, user *models2.User) ([]*models2.Message, error) {
 	return c.repo.GetPrivateMessages(ctx, user)
 }
 
-func (c *Chat) GetGlobalMessages(ctx context.Context) ([]*models.Message, error) {
+func (c *Chat) GetGlobalMessages(ctx context.Context) ([]*models2.Message, error) {
 	return c.repo.GetGlobalMessages(ctx)
 }
 
-func (c *Chat) AddPrivateMessage(ctx context.Context, user *models.User, recipient, textMessage string) error {
-	message := &models.Message{
+func (c *Chat) AddPrivateMessage(ctx context.Context, user *models2.User, recipient, textMessage string) error {
+	message := &models2.Message{
 		Author: user.Username,
 		Text:   textMessage,
 	}
@@ -115,8 +115,8 @@ func (c *Chat) AddPrivateMessage(ctx context.Context, user *models.User, recipie
 	return c.repo.AddPrivateMessage(ctx, recipient, message)
 }
 
-func (c *Chat) AddGlobalMessage(ctx context.Context, user *models.User, textMessage string) error {
-	message := &models.Message{
+func (c *Chat) AddGlobalMessage(ctx context.Context, user *models2.User, textMessage string) error {
+	message := &models2.Message{
 		Author: user.Username,
 		Text:   textMessage,
 	}
